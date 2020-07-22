@@ -16,9 +16,6 @@ import me.nathan.smsabuse_sf.R;
  * for each page
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
-    // Stores the current page
-    public static State state;
-
     // The tab titles and context for the application
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
@@ -41,10 +38,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                state = State.NUMBERS;
                 return new Numbers();
             case 1:
-                state = State.MESSAGE;
                 return new Message();
             default:
                 return new Wizdary();
@@ -71,24 +66,5 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         // Show 2 total pages.
         return 2;
-    }
-
-    /**
-     * Enum used to store which page the app is on, I could of just used a vanilla int, but I felt
-     * like being fancy
-     */
-    public static enum State {
-        MESSAGE(0),
-        NUMBERS(1);
-
-        int val;
-
-        State(int val) {
-            this.val = val;
-        }
-
-        public int getVal() {
-            return val;
-        }
     }
 }
