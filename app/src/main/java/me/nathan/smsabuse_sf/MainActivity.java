@@ -1,40 +1,33 @@
 package me.nathan.smsabuse_sf;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.app.*;
+import android.content.*;
 import android.content.pm.PackageManager;
-import android.os.Build;
-import android.telephony.SmsManager;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.os.Bundle;
-import android.util.Log;
 import android.net.Uri;
+import android.os.*;
+import android.telephony.SmsManager;
+import android.util.Log;
+import android.widget.*;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
+import me.nathan.smsabuse_sf.ui.main.Numbers;
 import me.nathan.smsabuse_sf.ui.main.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
     public int untitledCount = 0;
-    public static FloatingActionButton fab;
     public static HashMap<String, List<String>> numbers = new HashMap<>();
+    public static MainActivity self;
     int requestCode = 1;
-    Tab currentTab = Tab.NUMBERS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,45 +52,14 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-        // Setup the FloatingActionButton
-        fab = findViewById(R.id.fab);
-
-        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                setTab(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
-        fab.setOnClickListener(view -> {
-            // Check to see what tab the user is currently on
-            Log.i("SMSAbuse", "Application state: " + currentTab);
-            switch (currentTab) {
-                case MESSAGES:
-                    sendMessage();
-                    break;
-                case NUMBERS:
-                    requestNumbers();
-                    break;
-            }
-        });
+        self = this;
     }
 
     /**
      * Sends the message to all the numbers selected
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void sendMessage() {
+    public void sendMessage() {
         String message = ((TextView) findViewById(R.id.message)).getText().toString();
         Log.i("SMSAbuse", "stuffs");
 
@@ -192,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Prompts the user to select a CSV file with phone numbers
      */
-    private void requestNumbers() {
+    public void requestNumbers() {
         Log.i("SMSAbuse", "Starting number request");
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("text/*");
@@ -227,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
                     MainActivity.numbers.put("Untitled" + untitledCount, numbers);
                     untitledCount++;
-                    
+                    Numbers.updateDropdown();
                 } catch (IOException e) {
                     if (e instanceof FileNotFoundException) {
                         Toast.makeText(this, "Unable to find file", Toast.LENGTH_LONG).show();
@@ -277,41 +239,4 @@ public class MainActivity extends AppCompatActivity {
         return file.toString();
     }
 
-    /**
-     * Set [currentTab] to the value of position
-     * @param position The index of the current tab
-     */
-    void setTab(int position) {
-        switch (position) {
-            case 0:
-                currentTab = Tab.NUMBERS;
-                break;
-            case 1:
-                currentTab = Tab.MESSAGES;
-                break;
-            default:
-                currentTab = Tab.BLACK_MAGIC;
-        }
-    }
-
-    /**
-     * Enum to store the tab that the user is on, was [SectionsPageAdapter.State] in previous commit,
-     * after some experimentation, I have decided to move it to here seeing as the tab was not updated
-     * in the way I thought that it was.
-     */
-    public enum Tab {
-        BLACK_MAGIC(-1),
-        NUMBERS(0),
-        MESSAGES(1);
-
-        int state;
-
-        Tab(int state) {
-            this.state = state;
-        }
-
-        public int getState() {
-            return state;
-        }
-    }
 }

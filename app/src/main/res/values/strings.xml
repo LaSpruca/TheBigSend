@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SMS Abuse</string>
     <string name="tab_text_1">Numbers</string>
-    <string name="tab_text_2">Messages</string>
+    <string name="tab_text_2">Message</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="black_magic_fuckery">Harry, you\'re a wizard</string>
 </resources>

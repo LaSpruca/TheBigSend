@@ -2,12 +2,8 @@ package me.nathan.smsabuse_sf.ui.main;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.annotation.*;
+import androidx.fragment.app.*;
 
 import me.nathan.smsabuse_sf.R;
 
