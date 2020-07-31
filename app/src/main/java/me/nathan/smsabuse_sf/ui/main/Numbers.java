@@ -12,6 +12,7 @@ import android.widget.*;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -44,34 +45,35 @@ public class Numbers extends Fragment {
         FloatingActionButton fab = view.findViewById(R.id.numbers);
         fab.setOnClickListener((v) -> MainActivity.self.requestNumbers());
         ListView lv = MainActivity.self.findViewById(R.id.numberList);
-        lv.setAdapter(new ArrayAdapter<String>(MainActivity.self.getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, numbers));
+        lv.setAdapter(new ArrayAdapter<String>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, numbers));
         Spinner dropdown = MainActivity.self.findViewById(R.id.numbersDropdown);
         dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TextView textView  = (TextView) view;
-
-                numbers = new ArrayList<>(Objects.requireNonNull(MainActivity.numbers.get(textView.getText())));
-                synchronized (lv) {
-                    lv.notify();
-                }
+                updateListView(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 numbers = new ArrayList<>();
-                synchronized (lv) {
-                    lv.notify();
-                }
             }
         });
         updateDropdown();
     }
 
+    public static void updateListView(int position) {
+        ListView lv = MainActivity.self.findViewById(R.id.numberList);
+        String key = MainActivity.numbers.keySet().toArray(new String[0])[position];
+        ArrayList<String> numbers = new ArrayList<>(Objects.requireNonNull(MainActivity.numbers.get(key)));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, numbers);
+        lv.setAdapter(adapter);
+        MainActivity.currentList = key;
+    }
+
     public static void updateDropdown() {
         Spinner dropdown = MainActivity.self.findViewById(R.id.numbersDropdown);
         ArrayList<String> items = new ArrayList<>(MainActivity.numbers.keySet());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, items.toArray(new String[0]));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, items.toArray(new String[0]));
         dropdown.setAdapter(adapter);
     }
 }

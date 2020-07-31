@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public int untitledCount = 0;
     public static HashMap<String, List<String>> numbers = new HashMap<>();
     public static MainActivity self;
+    public static String currentList;
     int requestCode = 1;
 
     @Override
@@ -64,11 +65,10 @@ public class MainActivity extends AppCompatActivity {
         Log.i("SMSAbuse", "stuffs");
 
         runOnUiThread(() -> {
-            for (List<String> numbers : numbers.values()) {
-                for (String number : numbers) {
-                    sendSMS(number, message);
-                }
-                break;
+            for (String number : Objects.requireNonNull(numbers.get(currentList))) {
+                String num = validateNumber(number);
+                Log.i("SMSAbuse", "Sending message to " + num);
+                sendSMS(num, message);
             }
         });
     }
@@ -90,12 +90,8 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context arg0, Intent arg1) {
                 switch (getResultCode())
                 {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getBaseContext(), "SMS sent",
-                                Toast.LENGTH_SHORT).show();
-                        break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(getBaseContext(), "Generic failure",
+                        Toast.makeText(getBaseContext(), "Generic failure sending message",
                                 Toast.LENGTH_SHORT).show();
                         break;
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
@@ -109,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
                         Toast.makeText(getBaseContext(), "Radio off",
                                 Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
                         break;
                 }
             }
@@ -142,10 +140,12 @@ public class MainActivity extends AppCompatActivity {
     private String validateNumber(String number) {
         StringBuilder sb = new StringBuilder();
         sb.append(number);
-        if (sb.toString().startsWith("+64") || sb.toString().startsWith("64")) {
+        if (sb.toString().startsWith("64")) {
             sb.substring(0, 2);
+        } else if (sb.toString().startsWith("+64")) {
+            sb.substring(0, 3);
         }
-        if (sb.toString().startsWith("0")) {
+        if (!sb.toString().startsWith("0")) {
             sb.insert(0, "0");
         }
         return sb.toString();
@@ -183,9 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
                     List<String> numbers = new ArrayList<>(Arrays.asList(file.split(",")));
 
-                    for (String number : numbers) {
-                        Log.i("SMSAbuse", number);
-                    }
+                    numbers.removeIf(s -> s.length() < 1);
 
                     MainActivity.numbers.put("Untitled" + untitledCount, numbers);
                     untitledCount++;
