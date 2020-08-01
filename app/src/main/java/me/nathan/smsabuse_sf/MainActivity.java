@@ -8,14 +8,23 @@ import android.net.Uri;
 import android.os.*;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.io.*;
 import java.util.*;
@@ -25,14 +34,15 @@ import me.nathan.smsabuse_sf.ui.main.SectionsPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
     public int untitledCount = 0;
-    public static HashMap<String, List<String>> numbers = new HashMap<>();
+    public static Map<String, List<String>> numbers = new HashMap<>();
     public static MainActivity self;
     public static String currentList;
+    public static File jsonFile;
+    static final Gson gson = new Gson();
     int requestCode = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.READ_SMS) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.READ_SMS}, 2);
@@ -52,6 +62,35 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+
+        runOnUiThread(() -> {
+            try {
+                jsonFile = new File(getApplicationContext().getFilesDir(), "data.json");
+                if (!jsonFile.exists()) {
+                    jsonFile.createNewFile();
+                }
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile)));
+                String line;
+                String configString;
+                StringBuilder sb = new StringBuilder();
+
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                configString = sb.toString();
+                Log.i("SMSAbuse", configString);
+                numbers = gson.fromJson(configString, numbers.getClass());
+
+                if (numbers == null) {
+                    numbers = new HashMap<>();
+                }
+            } catch (IOException ex) {
+                Toast.makeText(getApplicationContext(), "Unable to open config file", Toast.LENGTH_LONG).show();
+                Log.e("SMSABUSE", "Not a brrrru");
+            }
+        });
 
         self = this;
     }
@@ -187,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
                     MainActivity.numbers.put("Untitled" + untitledCount, numbers);
                     untitledCount++;
+                    saveState();
                     Numbers.updateDropdown();
                 } catch (IOException e) {
                     if (e instanceof FileNotFoundException) {
@@ -235,6 +275,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return file.toString();
+    }
+
+    public static void saveState() {
+        String data = gson.toJson(MainActivity.numbers);
+        try {
+            BufferedWriter bf = new BufferedWriter(new FileWriter(jsonFile));
+            if (jsonFile.canWrite()) {
+                bf.write(data);
+                bf.flush();
+            }
+        } catch (IOException ex) {
+            Toast.makeText(self.getApplicationContext(), "Error writing to file", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

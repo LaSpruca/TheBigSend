@@ -4,4 +4,8 @@
     <string name="tab_text_2">Message</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="black_magic_fuckery">Harry, you\'re a wizard</string>
+    <string name="trash_can">Trash can</string>
+    <string name="pencile">Pencile</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 </resources>
