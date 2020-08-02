@@ -102,6 +102,7 @@ public class Numbers extends Fragment {
         });
         ImageButton deleteButton = view.findViewById(R.id.deleteButton);
         deleteButton.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.self);
             Spinner spinner = view.findViewById(R.id.numbersDropdown);
             if (MainActivity.numbers.size() > 0) {
                 int position = spinner.getSelectedItemPosition();

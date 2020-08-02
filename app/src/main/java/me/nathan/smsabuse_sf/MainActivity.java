@@ -43,6 +43,25 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+
+        if (!preferences.contains("firstOpen")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            TextView view = new TextView(this);
+            view.setText(R.string.starting_message);
+            view.setTextColor(getResources().getColor(R.color.white));
+            builder.setView(view);
+
+            builder.setPositiveButton("Ok", (dialog, y) -> dialog.dismiss());
+            builder.show();
+            preferences.edit().putBoolean("firstOpen", false).apply();
+        }
+
+        if (preferences.contains("untitledCount")) {
+            untitledCount = preferences.getInt("untitledCount", 0);
+        }
+
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.READ_SMS) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.READ_SMS}, 2);
@@ -226,6 +245,10 @@ public class MainActivity extends AppCompatActivity {
 
                     MainActivity.numbers.put("Untitled" + untitledCount, numbers);
                     untitledCount++;
+
+                    SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+                    preferences.edit().putInt("untitledCount", untitledCount).apply();
+
                     saveState();
                     Numbers.updateDropdown();
                 } catch (IOException e) {
