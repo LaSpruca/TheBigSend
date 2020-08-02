@@ -1,11 +1,14 @@
 package me.nathan.smsabuse_sf.ui.main;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.*;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -27,7 +30,6 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
  * The number selection menu, nothing special atm
  */
 public class Numbers extends Fragment {
-    static ArrayList<String> numbers = new ArrayList<>();
     public Numbers() {
         // Required empty public constructor
     }
@@ -47,8 +49,7 @@ public class Numbers extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         FloatingActionButton fab = view.findViewById(R.id.numbers);
         fab.setOnClickListener((v) -> MainActivity.self.requestNumbers());
-        ListView lv = MainActivity.self.findViewById(R.id.numberList);
-        lv.setAdapter(new ArrayAdapter<String>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, numbers));
+
         Spinner dropdown = MainActivity.self.findViewById(R.id.numbersDropdown);
         dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -58,52 +59,91 @@ public class Numbers extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                numbers = new ArrayList<>();
+                updateListView(-1);
             }
         });
         updateDropdown();
-        if (MainActivity.numbers.size() > 0) {
-            updateListView(0);
-        }
 
         ImageButton editButton = view.findViewById(R.id.editButton);
         editButton.setOnClickListener((view_) -> {
-            LayoutInflater layoutInflater = (LayoutInflater) MainActivity.self.getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-            ViewGroup container = (ViewGroup) layoutInflater.inflate(R.layout.edit_popup, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.self);
+            builder.setTitle("New name for list");
 
-            CoordinatorLayout coordinatorLayout = MainActivity.self.findViewById(R.id.main_layout);
+            // Set up the input
+            final EditText input = new EditText(MainActivity.self);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+            builder.setView(input);
 
-            PopupWindow popupWindow = new PopupWindow(container, 500, 500, true);
-            popupWindow.showAtLocation(coordinatorLayout, Gravity.CENTER, 0, 0);
-
-            container.setOnTouchListener((view1, motionEvent) -> {
-                view1.performClick();
-                popupWindow.dismiss();
-                MainActivity.self.findViewById(R.id.main_layout).setEnabled(true);
-                MainActivity.self.findViewById(R.id.main_layout).setAlpha(0.5f);
-                return true;
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Spinner spinner = view.findViewById(R.id.numbersDropdown);
+                    int position = spinner.getSelectedItemPosition();
+                    String newName = input.getText().toString();
+                    String key = MainActivity.numbers.keySet().toArray(new String[0])[position];
+                    List<String> numbers = MainActivity.numbers.get(key);
+                    MainActivity.numbers.remove(key);
+                    MainActivity.numbers.put(newName, numbers);
+                    MainActivity.saveState();
+                    updateDropdown();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
             });
 
-            MainActivity.self.findViewById(R.id.main_layout).setEnabled(false);
+            builder.show();
+
+        });
+        ImageButton deleteButton = view.findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(v -> {
+            Spinner spinner = view.findViewById(R.id.numbersDropdown);
+            if (MainActivity.numbers.size() > 0) {
+                int position = spinner.getSelectedItemPosition();
+                String key = MainActivity.numbers.keySet().toArray(new String[0])[position];
+                MainActivity.numbers.remove(key);
+            }
+            if (MainActivity.numbers.size() > 0) {
+                updateListView(0);
+                spinner.setSelection(0);
+            } else {
+                updateListView(-1);
+                updateDropdown();
+            }
+            MainActivity.saveState();
         });
     }
 
     public static void updateListView(int position) {
         ListView lv = MainActivity.self.findViewById(R.id.numberList);
+
         if (lv == null) {
             return;
-        }String key = MainActivity.numbers.keySet().toArray(new String[0])[position];
-        ArrayList<String> numbers = new ArrayList<>(Objects.requireNonNull(MainActivity.numbers.get(key)));
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, numbers);
-        lv.setAdapter(adapter);
-        MainActivity.currentList = key;
+        }
+
+        if (position != -1) {
+            String key = MainActivity.numbers.keySet().toArray(new String[0])[position];
+            ArrayList<String> numbers = new ArrayList<>(Objects.requireNonNull(MainActivity.numbers.get(key)));
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, numbers);
+            lv.setAdapter(adapter);
+        } else {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, new ArrayList<>());
+            lv.setAdapter(adapter);
+        }
     }
 
     public static void updateDropdown() {
         Spinner dropdown = MainActivity.self.findViewById(R.id.numbersDropdown);
+
         if (dropdown == null) {
             return;
         }
+
         ArrayList<String> items = new ArrayList<>(MainActivity.numbers.keySet());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, items.toArray(new String[0]));
         dropdown.setAdapter(adapter);
