@@ -1,11 +1,11 @@
-package me.nathan.smsabuse_sf.ui.main;
+package me.nathan.thebigsend.ui.main;
 
 import android.content.Context;
 
 import androidx.annotation.*;
 import androidx.fragment.app.*;
 
-import me.nathan.smsabuse_sf.R;
+import me.nathan.thebigsend.R;
 
 /**
  * Class responsible for handling the switching of tabs in the app, returns the appropriate fragment

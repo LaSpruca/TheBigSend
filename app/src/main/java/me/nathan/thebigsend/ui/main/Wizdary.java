@@ -1,4 +1,4 @@
-package me.nathan.smsabuse_sf.ui.main;
+package me.nathan.thebigsend.ui.main;
 
 import android.os.Bundle;
 
@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.nathan.smsabuse_sf.R;
+import me.nathan.thebigsend.R;
 
 /**
  * Fragement that displays if the user goes onto a page that does not exsit, i.e. not messages or numbers

@@ -1,4 +1,4 @@
-package me.nathan.smsabuse_sf;
+package me.nathan.thebigsend;
 
 import android.Manifest;
 import android.app.*;
@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.util.*;
 
-import me.nathan.smsabuse_sf.ui.main.*;
+import me.nathan.thebigsend.ui.main.*;
 
 public class MainActivity extends AppCompatActivity {
     /**

@@ -1,4 +1,4 @@
-package me.nathan.smsabuse_sf.ui.main;
+package me.nathan.thebigsend.ui.main;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import me.nathan.smsabuse_sf.MainActivity;
-import me.nathan.smsabuse_sf.R;
+import me.nathan.thebigsend.MainActivity;
+import me.nathan.thebigsend.R;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 

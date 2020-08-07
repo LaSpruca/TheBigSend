@@ -1,4 +1,4 @@
-package me.nathan.smsabuse_sf.ui.main;
+package me.nathan.thebigsend.ui.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import me.nathan.smsabuse_sf.MainActivity;
-import me.nathan.smsabuse_sf.R;
+import me.nathan.thebigsend.MainActivity;
+import me.nathan.thebigsend.R;
 /**
  * The message menu
  */

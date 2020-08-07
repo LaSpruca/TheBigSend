@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.nathan.smsabuse_sf">
+    package="me.nathan.thebigsend">
 
     <uses-permission android:name="android.permission.SEND_SMS"/>
-
+    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_new"
