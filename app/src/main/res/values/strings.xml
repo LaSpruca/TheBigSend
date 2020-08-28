@@ -13,4 +13,5 @@
         These can be created in google sheets on your phone.
         Please use the app responsibly, I am not responsible for anything that you may or may not do with the app.
     </string>
+    <string name="current_list">Current List</string>
 </resources>

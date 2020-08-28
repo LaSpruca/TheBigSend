@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +45,7 @@ public class Message extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get the floating action button
-        FloatingActionButton fab = view.findViewById(R.id.sendButton);
+        ImageButton fab = view.findViewById(R.id.sendButton);
 
         // Set it to send messages
         fab.setOnClickListener((v) -> MainActivity.self.sendMessage());

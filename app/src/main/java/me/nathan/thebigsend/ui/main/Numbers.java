@@ -171,6 +171,9 @@ public class Numbers extends Fragment {
                 MainActivity.numbers.remove(key);
             }
 
+            // Update the dropdown to make sure the data is correct
+            updateDropdown();
+
             // Is empty check must be re-run on the modified list to insure no errors
             if (!MainActivity.numbers.isEmpty()) {
                 // Update the listview and dropdown
@@ -179,7 +182,6 @@ public class Numbers extends Fragment {
             } else {
                 // Clear the list view and update the dropdown
                 updateListView(-1);
-                updateDropdown();
             }
 
             // Save the state
@@ -216,11 +218,19 @@ public class Numbers extends Fragment {
 
             // Set currentList to the current key
             MainActivity.currentList = key;
+
+            // Change the text on the current select list text view to reflect that of the actually selected list
+            ((TextView) MainActivity.self.findViewById(R.id.listNameView)).setText(key);
         } else {
             // Clear the list view
             ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.self.getApplicationContext(), R.layout.spinner_list_item, new ArrayList<>());
             lv.setAdapter(adapter);
+
+            // Set the current list to black
             MainActivity.currentList = "";
+
+            // Clear the text on the current select list text view
+            ((TextView) MainActivity.self.findViewById(R.id.listNameView)).setText("");
         }
     }
 

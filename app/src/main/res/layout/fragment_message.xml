@@ -12,32 +12,64 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/sendButton"
+            android:layout_height="550dp"
+            android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/message"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="top"
                 android:hint="@string/tab_text_2"
-                android:textAlignment="viewStart" />
+                android:textAlignment="gravity" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <LinearLayout
+            android:id="@+id/yes"
+            android:layout_width="0dp"
+            android:layout_height="61dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/sendButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.457"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textLayout">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/current_list"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/listNameView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=""
+                android:textAlignment="viewEnd"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <ImageButton
             android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_width="223dp"
+            android:layout_height="57dp"
             android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:focusable="true"
+            android:background="@drawable/rounded_corners_button"
             android:src="@drawable/ic_action_send"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
