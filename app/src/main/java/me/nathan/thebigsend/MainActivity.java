@@ -1,27 +1,42 @@
 package me.nathan.thebigsend;
 
 import android.Manifest;
-import android.app.*;
-import android.content.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
-import android.widget.*;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
-import java.io.*;
-import java.util.*;
-
-import me.nathan.thebigsend.ui.main.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     /**
@@ -56,14 +71,15 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * This function creates a new instance of the MainActivity, it:
-     *   - Shows the popup if this is the first time that the user has opened the app
-     *   - Requests permissions
-     *   - Calls default onCreate method and sets the view to the [activity_main.xml] layout
-     *   - Sets up the buttons, View Pager, Tab View, buttons etc,
-     *   - Loads numbers list from json file
-     *   - Sets self
+     * - Shows the popup if this is the first time that the user has opened the app
+     * - Requests permissions
+     * - Calls default onCreate method and sets the view to the [activity_main.xml] layout
+     * - Sets up the buttons, View Pager, Tab View, buttons etc,
+     * - Loads numbers list from json file
+     * - Sets self
      * This is a function called by android to tell it what to do when an instance of [MainActvity]
-       is created
+     * is created
+     *
      * @param savedInstanceState Parameter passed in from android
      */
     @Override
@@ -73,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Check to see if the app has SMS permissions
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.SEND_SMS}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, 1);
         }
 
         // Check to see weather the user has ever opened the app
@@ -84,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             // Create TextView to display the information
             TextView view = new TextView(this);
             view.setText(R.string.starting_message);
-            view.setTextColor(getResources().getColor(R.color.white));
+            view.setTextColor(getResources().getColor(R.color.primaryTextColor));
 
             // Add the text to the dialog box
             builder.setView(view);
@@ -98,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             // Save the fact that the user has already opened the app
             preferences.edit().putBoolean("firstOpen", false).apply();
         }
+
         // Get the untiled count to avoid list overwriting
         if (preferences.contains("untitledCount")) {
             untitledCount = preferences.getInt("untitledCount", 0);
@@ -108,15 +125,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the view to activity_main.xml
         setContentView(R.layout.activity_main);
-
-        // Create a SectionPageAdapter for the ViewPager
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-
-        // Setup the ViewPager and TabLayout
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
 
         // Read the numbers file and update the numbers variable
         // Is run on new thread to stop the app slowing down or crashing during the loading process
@@ -160,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ((TextView) findViewById(R.id.SelectedList)).setText("None");
+
         self = this;
     }
 
@@ -168,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void sendMessage() {
         // Get the message
-        String message = ((TextView) findViewById(R.id.message)).getText().toString();
+        String message = "Ye.";
 
         // On a new thread, send a message to each phone number
         // New thread helps stop the app hanging during sendage
@@ -194,11 +204,11 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Sends a message to a phone number
+     *
      * @param phoneNumber The phone number in question
-     * @param message The message to send to the phone number
+     * @param message     The message to send to the phone number
      */
-    private void sendSMS(String phoneNumber, String message)
-    {
+    private void sendSMS(String phoneNumber, String message) {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
 
@@ -211,11 +221,10 @@ public class MainActivity extends AppCompatActivity {
                 new Intent(DELIVERED), 0);
 
         // When the message has been sent
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     // If there was some generic error
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                         Toast.makeText(getBaseContext(), "Generic failure sending message",
@@ -246,11 +255,10 @@ public class MainActivity extends AppCompatActivity {
         }, new IntentFilter(SENT));
 
         // When the sms message was received
-        registerReceiver(new BroadcastReceiver(){
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                switch (getResultCode())
-                {
+                switch (getResultCode()) {
                     // If the message was sent do nothing
                     case Activity.RESULT_OK:
                         break;
@@ -278,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Function to check that the number is valid, this only supports nz country code
+     *
      * @param number The phone number that you want to check
      * @return The validated number
      */
@@ -316,9 +325,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Function to handle when a activity finishes, in this case, used for when the user selects a file
+     *
      * @param requestCode The [requestCode] code specified when [startActivityForResult] was called
-     * @param resultCode Weather the activity failed or succeed
-     * @param intent The intent for the Activity, contains returned information
+     * @param resultCode  Weather the activity failed or succeed
+     * @param intent      The intent for the Activity, contains returned information
      */
 
     @Override
@@ -359,8 +369,6 @@ public class MainActivity extends AppCompatActivity {
 
                     // Save the application state to the json file
                     saveState();
-                    // Update the dropdown
-                    Numbers.updateDropdown();
                 } catch (IOException e) {
                     // Catch any IOException
 
@@ -382,11 +390,12 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Gets the contents of a file
+     *
      * @param intent The intent congaing the data
      * @return The contents of the file specified in [intent]
-     * @throws NullPointerException If the intent's getData returns null
+     * @throws NullPointerException  If the intent's getData returns null
      * @throws FileNotFoundException If the file is not found, it kinda does what it says on the box
-     * @throws IOException If there is a problem with reading the file
+     * @throws IOException           If there is a problem with reading the file
      */
     String readFile(Intent intent) throws NullPointerException, FileNotFoundException, IOException {
         Log.i("SMSAbuse", "Reading file");
@@ -401,8 +410,8 @@ public class MainActivity extends AppCompatActivity {
         // Opening the file
         br = new BufferedReader(new
                 InputStreamReader(
-                        Objects.requireNonNull(
-                                getContentResolver().openInputStream(location))));
+                Objects.requireNonNull(
+                        getContentResolver().openInputStream(location))));
 
         // Reading the file
         StringBuilder file = new StringBuilder();
