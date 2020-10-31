@@ -7,4 +7,7 @@
     </string>
     <string name="numbers">Numbers</string>
     <string name="selected_list">Selected List:</string>
+    <string name="message">Message</string>
+    <string name="send">Send</string>
+    <string name="select">Select</string>
 </resources>

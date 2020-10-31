@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -169,6 +170,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ((TextView) findViewById(R.id.SelectedList)).setText("None");
+
+        Button btn = findViewById(R.id.SelectButton);
+        btn.setOnClickListener((currentView) -> {
+            startActivity(new Intent(this, NumbersActivity.class));
+        });
 
         self = this;
     }
