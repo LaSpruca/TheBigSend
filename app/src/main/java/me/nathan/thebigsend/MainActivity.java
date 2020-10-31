@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -22,7 +23,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,23 +38,25 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
     /**
      * Stores the number of lists created, used to create default list name
      */
-    public int untitledCount = 0;
+    public static int untitledCount = 0;
 
     /**
      * Stores all the lists of numbers
      */
-    public static Map<String, List<String>> numbers = new HashMap<>();
+    public static List<NumberList> numbers = new ArrayList<>();
 
     /**
      * A reference to the current instance of MainActivity
@@ -161,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // If there is no data, set numbers to be a new instance of HashMap
                 if (numbers == null) {
-                    numbers = new HashMap<>();
+                    numbers = new ArrayList<>();
                 }
             } catch (IOException ex) {
                 // Report if there was any error opening the file
@@ -196,10 +204,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Please select a list", Toast.LENGTH_LONG).show();
                     return;
                 }
-                // Get the numbers in the current list
-                for (String number : Objects.requireNonNull(numbers.get(currentList))) {
-                    // Send a sms message to the number with the message
-                    sendSMS(number, message);
+                // Get the current list
+                for (NumberList list : numbers.stream().filter(a -> a.getName().equals(currentList)).collect(Collectors.toList())) {
+                    for (Number num : list.numbers) {
+                        sendSMS(num.phoneNumber, message);
+                    }
                 }
             } catch (NullPointerException ex) {
                 // If the app fails to get the list at the index of current list, give an error stating that
@@ -283,151 +292,11 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // Send a message
-            sms.sendTextMessage(validateNumber(phoneNumber), null, message, sentPI, deliveredPI);
+            sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
         } catch (IllegalArgumentException ignored) {
             // If it did not work
             Toast.makeText(getApplicationContext(), "Bad phone number " + phoneNumber, Toast.LENGTH_LONG).show();
         }
-    }
-
-    /**
-     * Function to check that the number is valid, this only supports nz country code
-     *
-     * @param number The phone number that you want to check
-     * @return The validated number
-     */
-    private String validateNumber(String number) {
-        // Create a new string builder
-        StringBuilder sb = new StringBuilder();
-        sb.append(number);
-
-        // Remove the country code
-        if (sb.toString().startsWith("64")) {
-            sb.substring(0, 2);
-        } else if (sb.toString().startsWith("+64")) {
-            sb.substring(0, 3);
-        }
-
-        // Add 0 to start of number if not present
-        if (!sb.toString().startsWith("0")) {
-            sb.insert(0, "0");
-        }
-
-        // Return the validated string
-        return sb.toString();
-    }
-
-    /**
-     * Prompts the user to select a CSV file with phone numbers
-     */
-    public void requestNumbers() {
-        // Create a new intent
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        // Set the type to any form of text file
-        intent.setType("text/*");
-        // Get the user to pick a file
-        startActivityForResult(Intent.createChooser(intent, "Chose CSV file for numbers"), 1);
-    }
-
-    /**
-     * Function to handle when a activity finishes, in this case, used for when the user selects a file
-     *
-     * @param requestCode The [requestCode] code specified when [startActivityForResult] was called
-     * @param resultCode  Weather the activity failed or succeed
-     * @param intent      The intent for the Activity, contains returned information
-     */
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        // If it was the file choose intent
-        if (requestCode == 1) {
-            // If all went well
-            if (resultCode == RESULT_OK) {
-                try {
-                    // Read in the file
-                    String file = readFile(intent);
-
-                    // Remove all unwanted characters using a regex
-                    file = file.replaceAll("[a-zA-Z. \n\t]+", "");
-
-                    // Create a new ArrayList with the numbers
-                    List<String> numbers = new ArrayList<>(Arrays.asList(file.split(",")));
-
-                    // Remove the number is it is blank
-                    numbers.removeIf(s -> s.length() < 1);
-
-                    // Validate all the numbers
-                    for (int i = 0; i < numbers.size(); i++) {
-                        numbers.set(i, validateNumber(numbers.get(i)));
-                    }
-
-                    // Add it to the list of numbers with the name Untitled plus the untitledCount,
-                    // this is why it is saved at the start of the program
-                    MainActivity.numbers.put("Untitled" + untitledCount, numbers);
-
-                    // Increment the untitled count
-                    untitledCount++;
-
-                    // Save the new untitledCount
-                    SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-                    preferences.edit().putInt("untitledCount", untitledCount).apply();
-
-                    // Save the application state to the json file
-                    saveState();
-                } catch (IOException e) {
-                    // Catch any IOException
-
-                    // If it was a FileNotFound exception
-                    if (e instanceof FileNotFoundException) {
-                        // Tell the user that the file could not be found
-                        Toast.makeText(this, "Unable to find file", Toast.LENGTH_LONG).show();
-                    } else {
-                        // Report that the file could not be read
-                        Toast.makeText(this, "Unable to read file", Toast.LENGTH_LONG).show();
-                    }
-                } catch (NullPointerException e) {
-                    // If there was an error with the intent
-                    Toast.makeText(this, "Internal error", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the contents of a file
-     *
-     * @param intent The intent congaing the data
-     * @return The contents of the file specified in [intent]
-     * @throws NullPointerException  If the intent's getData returns null
-     * @throws FileNotFoundException If the file is not found, it kinda does what it says on the box
-     * @throws IOException           If there is a problem with reading the file
-     */
-    String readFile(Intent intent) throws NullPointerException, FileNotFoundException, IOException {
-        Log.i("SMSAbuse", "Reading file");
-
-        // Getting the location
-        Uri location = intent.getData();
-        if (location == null) {
-            throw new NullPointerException();
-        }
-        BufferedReader br;
-
-        // Opening the file
-        br = new BufferedReader(new
-                InputStreamReader(
-                Objects.requireNonNull(
-                        getContentResolver().openInputStream(location))));
-
-        // Reading the file
-        StringBuilder file = new StringBuilder();
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            file.append(line);
-        }
-
-        // Return the state
-        return file.toString();
     }
 
     public static void saveState() {
