@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Stores all the lists of numbers
      */
-    public static List<NumberList> numbers = new ArrayList<>();
+    public static ArrayList<NumberList> numbers = new ArrayList<>();
 
     /**
      * A reference to the current instance of MainActivity
@@ -141,45 +141,47 @@ public class MainActivity extends AppCompatActivity {
 
         // Read the numbers file and update the numbers variable
         // Is run on new thread to stop the app slowing down or crashing during the loading process
-//        runOnUiThread(() -> {
-//            try {
-//                // Get the config file
-//                jsonFile = new File(getApplicationContext().getFilesDir(), "data.json");
-//
-//                // Check to see if the file actual exist
-//                if (!jsonFile.exists()) {
-//                    // Create a new file
-//                    jsonFile.createNewFile();
-//                }
-//
-//                // Create a buffered reader to read the file
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile)));
-//
-//                String line;
-//                String configString;
-//                StringBuilder sb = new StringBuilder();
-//
-//                // Read the file line by line
-//                while ((line = reader.readLine()) != null) {
-//                    // Append the line to the string builder
-//                    sb.append(line);
-//                }
-//
-//                // Convert the StringBuilder to a String
-//                configString = sb.toString();
-//
-//                // Convert the string into a HashMap and save it in numbers
-//                numbers = gson.fromJson(configString, numbers.getClass());
-//
-//                // If there is no data, set numbers to be a new instance of HashMap
-//                if (numbers == null) {
-//                    numbers = new ArrayList<>();
-//                }
-//            } catch (IOException ex) {
-//                // Report if there was any error opening the file
-//                Toast.makeText(getApplicationContext(), "Unable to open config file", Toast.LENGTH_LONG).show();
-//            }
-//        });
+        runOnUiThread(() -> {
+            try {
+                // Get the config file
+                jsonFile = new File(getApplicationContext().getFilesDir(), "data.json");
+
+                // Check to see if the file actual exist
+                if (!jsonFile.exists()) {
+                    // Create a new file
+                    jsonFile.createNewFile();
+                }
+
+                // Create a buffered reader to read the file
+                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile)));
+
+                String line;
+                String configString;
+                StringBuilder sb = new StringBuilder();
+
+                // Read the file line by line
+                while ((line = reader.readLine()) != null) {
+                    // Append the line to the string builder
+                    sb.append(line);
+                }
+
+                // Convert the StringBuilder to a String
+                configString = sb.toString();
+
+                // Convert the string into a HashMap and save it in numbers
+                JsonData data = gson.fromJson(configString, JsonData.class);
+
+                numbers = data.numbersLists;
+
+                // If there is no data, set numbers to be a new instance of HashMap
+                if (numbers == null) {
+                    numbers = new ArrayList<>();
+                }
+            } catch (IOException ex) {
+                // Report if there was any error opening the file
+                Toast.makeText(getApplicationContext(), "Unable to open config file", Toast.LENGTH_LONG).show();
+            }
+        });
 
         ((TextView) findViewById(R.id.SelectedList)).setText("None");
 
@@ -304,22 +306,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void saveState() {
+        JsonData jsonData = new JsonData();
+        jsonData.numbersLists = numbers;
         // Serialize the numbers array to a json string
-//        String data = gson.toJson(MainActivity.numbers);
-//        try {
-//            // Create a new buffered reader to write to the jsonFile
-//            BufferedWriter bf = new BufferedWriter(new FileWriter(jsonFile));
-//
-//            // Check that there are write permissions
-//            if (jsonFile.canWrite()) {
-//                // Write the data
-//                bf.write(data);
-//                // Flush the stream
-//                bf.flush();
-//            }
-//        } catch (IOException ex) {
-//            // Tell the user if there was a problem writing to the file
-//            Toast.makeText(self.getApplicationContext(), "Error writing to file", Toast.LENGTH_SHORT).show();
-//        }
+        String data = gson.toJson(jsonData);
+        try {
+            // Create a new buffered reader to write to the jsonFile
+            BufferedWriter bf = new BufferedWriter(new FileWriter(jsonFile));
+
+            // Check that there are write permissions
+            if (jsonFile.canWrite()) {
+                // Write the data
+                bf.write(data);
+                // Flush the stream
+                bf.flush();
+            }
+        } catch (IOException ex) {
+            // Tell the user if there was a problem writing to the file
+            Toast.makeText(self.getApplicationContext(), "Error writing to file", Toast.LENGTH_SHORT).show();
+        }
+
+        SharedPreferences prefs = self.getPreferences(Context.MODE_PRIVATE);
+        prefs.edit().putInt("untitledCount", untitledCount).apply();
     }
 }

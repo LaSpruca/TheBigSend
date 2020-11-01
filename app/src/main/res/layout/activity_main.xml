@@ -12,14 +12,14 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/MesageTextView"
+            android:id="@+id/MessageTextView"
             style="@style/TextAppearance.MdcTypographyStyles.Headline4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="42dp"
             android:fontFamily="@font/roboto"
-            android:text="@string/numbers"
+            android:text="@string/message"
             android:textColor="@color/primaryTextColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/SelectButton" />
@@ -47,7 +47,7 @@
             android:backgroundTint="@color/primaryTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/MesageTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/MessageTextView" />
 
         <TextView
             android:id="@+id/SelectedList"

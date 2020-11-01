@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -157,19 +159,15 @@ public class NumbersActivity extends AppCompatActivity {
     }
 
     public void updateList() {
-        LinearLayout layout = findViewById(R.id.NumbersLayout);
-        LayoutInflater inflater = LayoutInflater.from(this);
+        RadioGroup layout = findViewById(R.id.NumbersLayout);
         layout.removeAllViews();
 
         for (NumberList list : MainActivity.numbers) {
-            View view = inflater.inflate(R.layout.fragment_list_entry, layout, false);
-            TextView listName = view.findViewById(R.id.ListName);
-            listName.setText(list.getName());
-            TextView count = view.findViewById(R.id.NumbersCount);
-            count.setText(String.valueOf(list.getNumbers().size()));
-            CheckBox bix = view.findViewById(R.id.ListSelected);
-            cards.add(view);
-            layout.addView(view);
+            RadioButton button = new RadioButton(this);
+            button.setText(list.getName());
+            button.setPadding(0, 8, 0, 8);
+            button.setTextSize(24);
+            layout.addView(button);
         }
     }
 }
