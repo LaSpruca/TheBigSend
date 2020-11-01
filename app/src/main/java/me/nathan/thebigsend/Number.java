@@ -1,8 +1,9 @@
 package me.nathan.thebigsend;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Number {
+public class Number implements Serializable {
     public String phoneNumber;
     public Map<String, String> mergeData;
 
@@ -10,6 +11,14 @@ public class Number {
         this.phoneNumber = phoneNumber;
         this.mergeData = mergeData;
         validateNumber();
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public Map<String, String> getMergeData() {
+        return mergeData;
     }
 
     /**

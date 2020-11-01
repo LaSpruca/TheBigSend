@@ -39,7 +39,7 @@
         <View
             android:id="@+id/divider2"
             android:layout_width="0dp"
-            android:layout_height="1dp"
+            android:layout_height="3dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
@@ -78,7 +78,7 @@
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
-            android:layout_height="1dp"
+            android:layout_height="3dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"

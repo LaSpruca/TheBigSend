@@ -5,8 +5,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +35,7 @@ import static me.nathan.thebigsend.MainActivity.saveState;
 import static me.nathan.thebigsend.MainActivity.untitledCount;
 
 public class NumbersActivity extends AppCompatActivity {
+    List<View> cards = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,7 @@ public class NumbersActivity extends AppCompatActivity {
                     .setNeutralButton("Ok", (a, b) -> {})
                     .show()
         );
+        updateList();
     }
 
     /**
@@ -101,8 +110,10 @@ public class NumbersActivity extends AppCompatActivity {
                                     untitledCount++;
                                     Log.i("TheBigSend", "Numbers: " +  numbers.toString());
                                     saveState();
-                                } catch (IOException ignored) {
+                                    updateList();
+                                } catch (IOException e) {
                                     Toast.makeText(this, "Could not read file", Toast.LENGTH_LONG).show();
+                                    Log.e("TheBigSend", "Error reading file", e);
                                 }
                             }
                         })
@@ -128,8 +139,10 @@ public class NumbersActivity extends AppCompatActivity {
                                         untitledCount++;
                                         Log.i("TheBigSend", "Numbers: " +  MainActivity.numbers.toString());
                                         saveState();
-                                    } catch (IOException ignored) {
+                                        updateList();
+                                    } catch (IOException e) {
                                         Toast.makeText(this, "Could not read file", Toast.LENGTH_LONG).show();
+                                        Log.e("TheBigSend", "Error reading file", e);
                                     }
                                 }
                             });
@@ -140,6 +153,23 @@ public class NumbersActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Error getting file", Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    public void updateList() {
+        LinearLayout layout = findViewById(R.id.NumbersLayout);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        layout.removeAllViews();
+
+        for (NumberList list : MainActivity.numbers) {
+            View view = inflater.inflate(R.layout.fragment_list_entry, layout, false);
+            TextView listName = view.findViewById(R.id.ListName);
+            listName.setText(list.getName());
+            TextView count = view.findViewById(R.id.NumbersCount);
+            count.setText(String.valueOf(list.getNumbers().size()));
+            CheckBox bix = view.findViewById(R.id.ListSelected);
+            cards.add(view);
+            layout.addView(view);
         }
     }
 }
