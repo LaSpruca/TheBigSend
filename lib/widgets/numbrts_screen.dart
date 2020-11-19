@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:the_big_send/util/constants.dart';
@@ -33,6 +34,12 @@ class _NumbersPageState extends State<NumbersPage> {
                 : NeverScrollableScrollPhysics()));
   }
 
+  void openFile() {
+    FilePicker.platform
+        .pickFiles(type: FileType.any)
+        .then((value) => {print(value)});
+  }
+
   @override
   Widget _build(BuildContext content) {
     return Column(
@@ -59,7 +66,7 @@ class _NumbersPageState extends State<NumbersPage> {
                       Row(
                         children: [
                           RaisedButton(
-                              onPressed: () => {},
+                              onPressed: () => openFile(),
                               child: Text(
                                 "CSV FILE",
                                 style: normalBold,
