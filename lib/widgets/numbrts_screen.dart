@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -22,7 +24,6 @@ class _NumbersPageState extends State<NumbersPage> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var padding = MediaQuery.of(context).padding;
-    print(height - padding.top - padding.bottom);
     return Scaffold(
         appBar: AppBar(
           title: Text("The Big Send"),
@@ -34,10 +35,20 @@ class _NumbersPageState extends State<NumbersPage> {
                 : NeverScrollableScrollPhysics()));
   }
 
-  void openFile() {
-    FilePicker.platform
-        .pickFiles(type: FileType.any)
-        .then((value) => {print(value)});
+  Future openFile(BuildContext context) async {
+    var result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ["text/csv"]);
+
+    if (result == null) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text("File picker failed"),
+      ));
+    } else {
+      var file = File(result.files.single.path);
+      var data = await file.readAsString();
+
+      print(data);
+    }
   }
 
   @override
@@ -66,7 +77,7 @@ class _NumbersPageState extends State<NumbersPage> {
                       Row(
                         children: [
                           RaisedButton(
-                              onPressed: () => openFile(),
+                              onPressed: () => openFile(context),
                               child: Text(
                                 "CSV FILE",
                                 style: normalBold,

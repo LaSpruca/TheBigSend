@@ -1,14 +1,14 @@
 import 'dart:collection';
 
-class Number {
+class PhoneNumber {
   String number;
   Map<String, String> _mergeData;
 
-  Number(this.number) {
+  PhoneNumber(this.number) {
     _mergeData = HashMap();
   }
 
-  Number.withMergeData(this.number, this._mergeData);
+  PhoneNumber.withMergeData(this.number, this._mergeData);
 
   String processMessage(String message) {
     print(_mergeData);

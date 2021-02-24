@@ -3,14 +3,14 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:the_big_send/widgets/numbrts_screen.dart';
 import 'package:the_big_send/util/constants.dart';
 
-class MainScreen extends StatefulWidget {
-  MainScreen({Key key}) : super(key: key);
+class MainPage extends StatefulWidget {
+  MainPage({Key key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _MainScreenState();
+  State<StatefulWidget> createState() => _MainPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainPageState extends State<MainPage> {
   String currentList = "";
 
   bool kbVisable = false;
@@ -55,10 +55,8 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       Center(
                         child: RaisedButton(
-                          onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => NumbersPage())),
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/numbers'),
                           child: Text(
                             "SELECT",
                             style: TextStyle(fontWeight: FontWeight.bold),
