@@ -2,11 +2,9 @@ import 'dart:collection';
 
 class PhoneNumber {
   String number;
-  Map<String, String> _mergeData;
+  Map<String, String> _mergeData = HashMap();
 
-  PhoneNumber(this.number) {
-    _mergeData = HashMap();
-  }
+  PhoneNumber(this.number);
 
   PhoneNumber.withMergeData(this.number, this._mergeData);
 
@@ -25,7 +23,9 @@ class PhoneNumber {
       var index = splits.indexOf(key);
       print("\"$key\"");
       if (index >= 0) {
-        splits[index] = _mergeData[key];
+        if (_mergeData[key] != null) {
+          splits[index] = _mergeData[key]!;
+        }
       }
     }
     return splits.join(" ");

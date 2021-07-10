@@ -1,8 +1,10 @@
+import 'dart:collection';
+
 import 'package:redux/redux.dart';
 import 'package:the_big_send/util/numbers.dart';
 
 class AppState {
-  Map<String, List<PhoneNumber>> numbersLists;
+  Map<String, List<PhoneNumber>> numbersLists = HashMap();
 
   AppState(this.numbersLists);
 
@@ -11,21 +13,22 @@ class AppState {
   }
 }
 
-class NumbersList {
-  Map<String, List<PhoneNumber>> payload;
+class AddList {
+  String listName;
+  List<PhoneNumber> numbers;
+
+  AddList(this.listName, this.numbers);
 }
 
-AppState reducer(AppState prev, dynamic action) {
-  AppState newState = AppState.fromAppState(prev);
-  switch (action.runtimeType) {
-    case NumbersList:
-      newState.numbersLists = action.payload;
-      break;
+AppState reducer(AppState ogState, dynamic payload) {
+  switch (payload.runtimeType) {
+    case AddList:
+      var data = payload as AddList;
+      ogState.numbersLists[data.listName] = data.numbers;
+      return ogState;
     default:
-      print("Invalid action");
-      break;
+      return ogState;
   }
-  return newState;
 }
 
 final Store<AppState> store = Store(reducer, initialState: AppState(Map()));

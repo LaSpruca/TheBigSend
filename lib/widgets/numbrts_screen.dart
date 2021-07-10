@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:the_big_send/util/constants.dart';
+import 'package:the_big_send/util/util.dart';
 
 class NumbersPage extends StatefulWidget {
   @override
@@ -14,13 +16,6 @@ class _NumbersPageState extends State<NumbersPage> {
   bool kbVisable = false;
 
   @override
-  void initState() {
-    KeyboardVisibility.onChange
-        .listen((kbState) => setState(() => {kbVisable = kbState}));
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var padding = MediaQuery.of(context).padding;
@@ -28,11 +23,13 @@ class _NumbersPageState extends State<NumbersPage> {
         appBar: AppBar(
           title: Text("The Big Send"),
         ),
-        body: SingleChildScrollView(
-            child: _build(context),
-            physics: kbVisable || height - padding.top - padding.bottom < 700
-                ? null
-                : NeverScrollableScrollPhysics()));
+        body: KeyboardVisibilityBuilder(
+            builder: (context, kbVisable) => SingleChildScrollView(
+                child: _build(context),
+                physics:
+                    kbVisable || height - padding.top - padding.bottom < 700
+                        ? null
+                        : NeverScrollableScrollPhysics())));
   }
 
   Future openFile(BuildContext context) async {
@@ -40,14 +37,26 @@ class _NumbersPageState extends State<NumbersPage> {
         .pickFiles(type: FileType.custom, allowedExtensions: ["text/csv"]);
 
     if (result == null) {
-      Scaffold.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("File picker failed"),
       ));
     } else {
-      var file = File(result.files.single.path);
-      var data = await file.readAsString();
+      var file = File(result.files.single.path!);
+      var str = await file.readAsString();
 
-      print(data);
+      print(str);
+
+      List<List<dynamic>> data = CsvToListConverter().convert(str);
+
+      if (data.isEmpty) {
+        return Future.value();
+      }
+
+      if (data[0].isEmpty) {
+        return Future.value();
+      }
+
+      if (inNumber(data[0].toString())) {}
     }
   }
 
@@ -76,13 +85,13 @@ class _NumbersPageState extends State<NumbersPage> {
                       ),
                       Row(
                         children: [
-                          RaisedButton(
+                          ElevatedButton(
                               onPressed: () => openFile(context),
                               child: Text(
                                 "CSV FILE",
                                 style: normalBold,
                               )),
-                          RaisedButton(
+                          ElevatedButton(
                               onPressed: () => {
                                     showDialog(
                                         context: context,

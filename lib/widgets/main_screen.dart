@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:the_big_send/widgets/numbrts_screen.dart';
 import 'package:the_big_send/util/constants.dart';
 
 class MainPage extends StatefulWidget {
-  MainPage({Key key}) : super(key: key);
-
   @override
   State<StatefulWidget> createState() => _MainPageState();
 }
@@ -13,28 +10,21 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   String currentList = "";
 
-  bool kbVisable = false;
-
-  @override
-  void initState() {
-    KeyboardVisibility.onChange
-        .listen((kbState) => setState(() => {kbVisable = kbState}));
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var padding = MediaQuery.of(context).padding;
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("The Big Send"),
-        ),
-        body: SingleChildScrollView(
-            child: _build(context),
-            physics: kbVisable || height - padding.top - padding.bottom < 700
-                ? null
-                : NeverScrollableScrollPhysics()));
+    return KeyboardVisibilityBuilder(
+        builder: (context, kbVisable) => Scaffold(
+            appBar: AppBar(
+              title: Text("The Big Send"),
+            ),
+            body: SingleChildScrollView(
+                child: _build(context),
+                physics:
+                    kbVisable || height - padding.top - padding.bottom < 700
+                        ? null
+                        : NeverScrollableScrollPhysics())));
   }
 
   Widget _build(BuildContext content) {
