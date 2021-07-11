@@ -92,32 +92,33 @@ class _NumbersPageState extends State<NumbersPage> {
       }
 
       var header = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Header'),
-              content: SingleChildScrollView(
-                child: Text(
-                  "Does you csv have a header?",
-                  style: normal,
-                ),
-              ),
-              actions: <Widget>[
-                SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.pop(context, true);
-                  },
-                  child: const Text('Yes'),
-                ),
-                SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.pop(context, false);
-                  },
-                  child: const Text('No'),
-                ),
-              ],
-            );
-          });
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Header'),
+                  content: SingleChildScrollView(
+                    child: Text(
+                      "Does you csv have a header?",
+                      style: normal,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    SimpleDialogOption(
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: const Text('Yes'),
+                    ),
+                    SimpleDialogOption(
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      child: const Text('No'),
+                    ),
+                  ],
+                );
+              }) ??
+          false;
 
       List<PhoneNumber> numbers = [];
 
@@ -126,6 +127,14 @@ class _NumbersPageState extends State<NumbersPage> {
         data.removeAt(0);
         var phoneNoCol = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => SelectColumn(headers)));
+
+        if (phoneNoCol == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                "Unable to import list, please select a phone number column"),
+          ));
+        }
+
         var phoneNoColIndex = headers.indexOf(phoneNoCol);
 
         data = data.where((e) => isNumber(e[phoneNoColIndex])).toList();
