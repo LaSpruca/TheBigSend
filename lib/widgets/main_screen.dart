@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:the_big_send/state.dart';
 import 'package:the_big_send/util/constants.dart';
 
 class MainPage extends StatefulWidget {
@@ -28,6 +29,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _build(BuildContext content) {
+    if (currentList != "") {
+      print(store.state.numbersLists[currentList]);
+    }
     return Column(
       children: [
         Padding(
@@ -45,8 +49,14 @@ class _MainPageState extends State<MainPage> {
                       ),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, '/numbers'),
+                          onPressed: () => Navigator.pushNamed(
+                                  context, '/numbers')
+                              .then((value) => {
+                                    setState(() => {
+                                          currentList =
+                                              value?.toString() ?? currentList
+                                        })
+                                  }),
                           child: Text(
                             "SELECT",
                             style: TextStyle(fontWeight: FontWeight.bold),

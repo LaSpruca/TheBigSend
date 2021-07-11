@@ -1,15 +1,16 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:the_big_send/state.dart';
 import 'package:the_big_send/util/constants.dart';
 import 'package:the_big_send/util/numbers.dart';
 import 'package:the_big_send/util/util.dart';
+import 'package:the_big_send/widgets/new_name.dart';
 import 'package:the_big_send/widgets/select_column.dart';
 
 class NumbersPage extends StatefulWidget {
@@ -23,14 +24,18 @@ class _NumbersPageState extends State<NumbersPage> {
       ? [""]
       : store.state.numbersLists.keys.toList();
 
+  StreamSubscription<AppState>? listener;
+
   @override
   void initState() {
     listName = listNames[0];
-    store.onChange.listen((state) {
+    listener = store.onChange.listen((state) {
       setState(() {
         listNames = state.numbersLists.keys.toList();
-
-        if (!listNames.contains(listName)) {
+        if (listNames.isEmpty) {
+          listName = "";
+          listNames = [];
+        } else if (!listNames.contains(listName)) {
           setState(() {
             listName = listNames[0];
           });
@@ -41,24 +46,22 @@ class _NumbersPageState extends State<NumbersPage> {
   }
 
   @override
+  void dispose() {
+    listener?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print("Building widget");
-    if (listName != "") {
-      print(store.state.numbersLists[listName]);
-    }
     var height = MediaQuery.of(context).size.height;
     var padding = MediaQuery.of(context).padding;
     return Scaffold(
         appBar: AppBar(
           title: Text("The Big Send"),
         ),
-        body: KeyboardVisibilityBuilder(
-            builder: (context, kbVisible) => SingleChildScrollView(
-                child: _build(context),
-                physics:
-                    kbVisible || height - padding.top - padding.bottom < 700
-                        ? null
-                        : NeverScrollableScrollPhysics())));
+        body: SingleChildScrollView(
+          child: _build(context),
+        ));
   }
 
   Future openFile(BuildContext context) async {
@@ -116,8 +119,6 @@ class _NumbersPageState extends State<NumbersPage> {
             );
           });
 
-      print(data);
-
       List<PhoneNumber> numbers = [];
 
       if (header == true) {
@@ -125,7 +126,6 @@ class _NumbersPageState extends State<NumbersPage> {
         data.removeAt(0);
         var phoneNoCol = await Navigator.push(context,
             MaterialPageRoute(builder: (context) => SelectColumn(headers)));
-        print(phoneNoCol);
         var phoneNoColIndex = headers.indexOf(phoneNoCol);
 
         data = data.where((e) => isNumber(e[phoneNoColIndex])).toList();
@@ -133,7 +133,9 @@ class _NumbersPageState extends State<NumbersPage> {
         for (int i = 0; i < data.length; i++) {
           var record = data[i];
           var number = new HashMap<String, String>();
-          for (int ii = 0; i < record.length; i++) {
+          print(record);
+          for (int ii = 0; ii < record.length; ii++) {
+            print("Adding value ${record[ii]} for ${headers[ii]}");
             if (ii != phoneNoColIndex) {
               number[headers[ii]] = record[ii];
             }
@@ -266,8 +268,79 @@ class _NumbersPageState extends State<NumbersPage> {
                               child: Text(value),
                             );
                           }).toList(),
+                        )),
+                    Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.all(5),
+                                child: ElevatedButton(
+                                    onPressed: () => {
+                                          Navigator.push<String>(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          NewListName(
+                                                              listName)))
+                                              .then((value) {
+                                            if (value != null) {
+                                              store.dispatch(ChangeListName(
+                                                  listName, value));
+                                              setState(() {
+                                                listName = value;
+                                              });
+                                            }
+                                          })
+                                        },
+                                    child: Text("Change Name"))),
+                            Padding(
+                                padding: EdgeInsets.all(5),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      showDialog<bool>(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title:
+                                                  const Text('Confirm Delete'),
+                                              content: SingleChildScrollView(
+                                                child: Text(
+                                                  "Are you sure you want to delete the list $listName",
+                                                  style: normal,
+                                                ),
+                                              ),
+                                              actions: <Widget>[
+                                                SimpleDialogOption(
+                                                  onPressed: () {
+                                                    store.dispatch(
+                                                        RemoveList(listName));
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text('Yes'),
+                                                ),
+                                                SimpleDialogOption(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text('No'),
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                    child: Text("Delete List")))
+                          ],
                         ))
                   ]))),
+        ),
+        Padding(
+          padding: EdgeInsets.all(24),
+          child: ElevatedButton(
+            child: Text("Select"),
+            onPressed: () => {Navigator.pop(context, listName)},
+          ),
         )
       ],
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

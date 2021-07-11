@@ -30,4 +30,9 @@ class PhoneNumber {
     }
     return splits.join(" ");
   }
+
+  @override
+  String toString() {
+    return "{number: $number, mergeData: $_mergeData}";
+  }
 }
