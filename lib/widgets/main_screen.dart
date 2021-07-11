@@ -44,7 +44,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       Center(
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           onPressed: () =>
                               Navigator.pushNamed(context, '/numbers'),
                           child: Text(

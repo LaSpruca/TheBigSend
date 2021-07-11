@@ -5,8 +5,9 @@ import 'package:the_big_send/util/numbers.dart';
 
 class AppState {
   Map<String, List<PhoneNumber>> numbersLists = HashMap();
+  int count = 0;
 
-  AppState(this.numbersLists);
+  AppState(this.numbersLists, this.count);
 
   AppState.fromAppState(AppState another) {
     numbersLists = another.numbersLists;
@@ -25,10 +26,11 @@ AppState reducer(AppState ogState, dynamic payload) {
     case AddList:
       var data = payload as AddList;
       ogState.numbersLists[data.listName] = data.numbers;
+      ogState.count++;
       return ogState;
     default:
       return ogState;
   }
 }
 
-final Store<AppState> store = Store(reducer, initialState: AppState(Map()));
+final Store<AppState> store = Store(reducer, initialState: AppState(Map(), 0));
