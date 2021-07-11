@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:the_big_send/state.dart';
 import 'package:the_big_send/util/constants.dart';
+import 'package:the_big_send/util/numbers.dart';
+import 'package:the_big_send/util/sms.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -10,6 +12,25 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   String currentList = "";
+  String message = "";
+  late TextEditingController textController;
+
+  @override
+  void initState() {
+    textController = TextEditingController();
+    textController.addListener(() {
+      setState(() {
+        message = textController.text;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +126,7 @@ class _MainPageState extends State<MainPage> {
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           style: normal,
+                          controller: textController,
                           decoration: InputDecoration(
                             contentPadding:
                                 EdgeInsets.fromLTRB(5.0, 15.0, 20.0, 5.0),
@@ -112,9 +134,36 @@ class _MainPageState extends State<MainPage> {
                           ),
                         ))
                   ]))),
-        )
+        ),
+        ElevatedButton(
+            onPressed: () => sendMessages(context),
+            child: Text(
+              "Send",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ))
       ],
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
+  }
+
+  void sendMessages(BuildContext context) {
+    var list = store.state.numbersLists[currentList]!;
+
+    if (!list[0].hasMergeData()) {
+      sendSMS(message: message, recipients: list.map((e) => e.number).toList());
+      return;
+    }
+
+    for (var entry in list) {
+      sendMessage(entry);
+    }
+  }
+
+  Future sendMessage(PhoneNumber number) async {
+    var processed = number.processMessage(message);
+
+    sendSMS(message: processed, recipients: [number.number]);
+
+    return Future.value();
   }
 }

@@ -53,8 +53,6 @@ class _NumbersPageState extends State<NumbersPage> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var padding = MediaQuery.of(context).padding;
     return Scaffold(
         appBar: AppBar(
           title: Text("The Big Send"),

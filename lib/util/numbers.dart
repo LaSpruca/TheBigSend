@@ -8,6 +8,8 @@ class PhoneNumber {
 
   PhoneNumber.withMergeData(this.number, this._mergeData);
 
+  bool hasMergeData() => _mergeData.isNotEmpty;
+
   String processMessage(String message) {
     print(_mergeData);
     var splits = message

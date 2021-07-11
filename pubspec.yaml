@@ -33,6 +33,7 @@ dependencies:
   flutter_redux: ^0.8.2
   flutter_keyboard_visibility: ^5.0.2
   file_picker: ^3.0.3
+  permission_handler: ^8.1.2
 
 dev_dependencies:
   flutter_test:
