@@ -1,7 +1,8 @@
 
 ------------------------------------------------------------------------------------  
   
-<h1 align="center">The Big Send</h1>  
+<h1 align="center">The Big Send</h1>
+<p align="center"><img src="logo.svg" alt="The Big Send Logo" width="200px"></p>
 <h2 align="center">A secure and easy bulk message sender</h2>  
 <p align="center">  
     <img src="https://raster.shields.io/badge/Using-Flutter-blue?style=for-the-badge" alt="Using flutter"/>  

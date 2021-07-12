@@ -10,7 +10,7 @@
 
     <application
         android:label="The Big Send"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/app_icon">
         <activity
             android:name="nz.laspruca.theBigSend.MainActivity"
             android:launchMode="singleTop"
