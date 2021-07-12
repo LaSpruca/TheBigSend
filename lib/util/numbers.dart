@@ -1,5 +1,10 @@
 import 'dart:collection';
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'numbers.g.dart';
+
+@JsonSerializable()
 class PhoneNumber {
   String number;
   Map<String, String> _mergeData = HashMap();
@@ -32,6 +37,11 @@ class PhoneNumber {
     }
     return splits.join(" ");
   }
+
+  factory PhoneNumber.fromJson(Map<String, dynamic> json) =>
+      _$PhoneNumberFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PhoneNumberToJson(this);
 
   @override
   String toString() {
