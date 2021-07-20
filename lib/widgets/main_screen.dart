@@ -123,6 +123,7 @@ class _MainPageState extends State<MainPage> {
                         padding: EdgeInsets.fromLTRB(0.0, 16, 0.0, 16),
                         child: TextField(
                           obscureText: false,
+                          maxLength: 16000,
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           style: normal,
