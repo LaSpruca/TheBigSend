@@ -133,6 +133,8 @@ class _NumbersPageState extends State<NumbersPage> {
           ));
         }
 
+        print("Header $headers");
+
         var phoneNoColIndex = headers.indexOf(phoneNoCol);
 
         data = data.where((e) => isNumber(e[phoneNoColIndex])).toList();

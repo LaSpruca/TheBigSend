@@ -63,7 +63,7 @@ Before building the application, the json parsers need to be built. This can be 
 one of two ways:
 1. One time build
 ```shell
-flutter pub run build_runner
+flutter pub run build_runner build
 ```
 2. In watch mode
 ```shell

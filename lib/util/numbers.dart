@@ -7,16 +7,16 @@ part 'numbers.g.dart';
 @JsonSerializable()
 class PhoneNumber {
   String number;
-  Map<String, String> _mergeData = HashMap();
+  Map<String, String> mergeData = HashMap();
 
   PhoneNumber(this.number);
 
-  PhoneNumber.withMergeData(this.number, this._mergeData);
+  PhoneNumber.withMergeData(this.number, this.mergeData);
 
-  bool hasMergeData() => _mergeData.isNotEmpty;
+  bool hasMergeData() => mergeData.isNotEmpty;
 
   String processMessage(String message) {
-    print(_mergeData);
+    print(mergeData);
     var splits = message
         .split("{{")
         .map((val) => val.split("}}"))
@@ -26,12 +26,14 @@ class PhoneNumber {
     for (var i in splits) {
       print("\"$i\"");
     }
-    for (var key in _mergeData.keys) {
+    for (var key in mergeData.keys) {
       var index = splits.indexOf(key);
       print("\"$key\"");
       if (index >= 0) {
-        if (_mergeData[key] != null) {
-          splits[index] = _mergeData[key]!;
+        if (mergeData[key] != null) {
+          splits[index] = mergeData[key]!;
+        } else {
+          print("No merge key $key");
         }
       }
     }
@@ -45,6 +47,6 @@ class PhoneNumber {
 
   @override
   String toString() {
-    return "{number: $number, mergeData: $_mergeData}";
+    return "{number: $number, mergeData: $mergeData}";
   }
 }
